@@ -1,0 +1,7 @@
+name: dict_to_quizlet
+dependencies:
+    - python==3.7
+    - pip
+    - pip:
+        - Flask==1.0.2
+        - Flask-Cors==3.0.7
