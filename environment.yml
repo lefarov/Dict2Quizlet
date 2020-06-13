@@ -3,5 +3,9 @@ dependencies:
     - python==3.7
     - pip
     - pip:
-        - Flask==1.0.2
-        - Flask-Cors==3.0.7
+        - Flask
+        - Flask-Cors
+        - requests
+        - lxml
+        - argparse
+        - tabulate
