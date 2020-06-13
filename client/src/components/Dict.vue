@@ -9,24 +9,29 @@
                type="text"
                class="form-control"
                placeholder="Search term"
-               v-model="query">
+               v-model="query"
+               @keyup.enter="onTranslate">
         <div class="input-group-append">
           <button type="button"
                   class="btn btn-success btn-sm"
-                  @click="onTranslate">Translate</button>
+                  @click="onTranslate">
+                  Translate
+          </button>
         </div>
       </div>
-      <table class="table table-striped table-sm">
-        <thead>
+      <table class="table table-striped table-sm"
+             v-for="(category, name, index) in translation"
+             :key="index">
+        <thead class="thead-dark">
           <tr>
-            <th scope="col">en</th>
-            <th scope="col">de</th>
+            <th scope="col">{{ name }}</th>
+            <th scope="col"></th>
           </tr>
         </thead>
         <tbody>
-            <tr v-for="(translation, index) in translation.subst" :key="index">
-              <td>{{ translation.en }}</td>
-              <td>{{ translation.de }}</td>
+            <tr v-for="(translation, index) in category" :key="index">
+              <td style="width: 50%">{{ translation.en }}</td>
+              <td style="width: 50%">{{ translation.de }}</td>
             </tr>
         </tbody>
       </table>
