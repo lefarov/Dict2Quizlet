@@ -9,14 +9,14 @@
                type="text"
                class="form-control"
                placeholder="Search term"
-               v-model="term">
+               v-model="query">
         <div class="input-group-append">
           <button type="button"
                   class="btn btn-success btn-sm"
-                  @click="searchTerm">Search</button>
+                  @click="onTranslate">Translate</button>
         </div>
       </div>
-      <table class="table table-striped">
+      <table class="table table-striped table-sm">
         <thead>
           <tr>
             <th scope="col">en</th>
@@ -35,18 +35,29 @@
 </template>
 
 <script>
-// import axios from 'axios';
+import axios from 'axios';
 
 export default {
   data() {
     return {
-      term: '',
+      query: '',
       translation: [],
     };
   },
   methods: {
-    searchTerm() {
-
+    searchTranslation(query) {
+      const path = `http://localhost:5000/search/${query}`;
+      axios.get(path)
+        .then((res) => {
+          this.translation = res.data.translation;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    onTranslate() {
+      this.searchTranslation(this.query);
     },
   },
 };
