@@ -3,6 +3,8 @@ import uuid
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
+from leo import search
+
 
 BOOKS = [
     {
@@ -48,6 +50,14 @@ def get_book_index(book_id):
 @app.route('/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
+
+
+@app.route("/search/<query>", methods=["GET"])
+def translate(query):
+    response_object = {"status": "success"}
+    results = search(query, "https://dict.leo.org/german-english/")
+    response_object["translation"] = results
+    return jsonify(response_object)
 
 
 @app.route('/books', methods=['GET', 'POST'])
