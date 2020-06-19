@@ -36,18 +36,30 @@
         </tbody>
       </table>
       <div class="input-group mb-3">
-        <textarea name="selected-translation"
-                  rows="5"
-                  cols="20"
-                  v-model="selectedTranslation"></textarea>
+        <input id="selected-term"
+               type="text"
+               class="form-control"
+               v-model="selectedTerm">
+        <input id="selected-translation"
+               type="text"
+               class="form-control"
+               v-model="selectedTranslation">
         <div class="input-group-append">
           <button type="button"
-                  class="btn btn-success btn-sm"
+                  class="btn btn-danger btn-sm"
                   @click="onSelectTranslation">
-                  Add Translation
+                  Clear
+          </button>
+          <button type="button"
+                  class="btn btn-primary btn-sm"
+                  @click="onSelectTranslation">
+                  Submit
           </button>
         </div>
       </div>
+      <!-- <textarea name="selected-translation"
+                  class="form-control"
+                  v-model="selectedTranslation"></textarea> -->
     </div>
   </div>
 </template>
@@ -60,6 +72,7 @@ export default {
     return {
       query: '',
       translation: [],
+      selectedTerm: '',
       selectedTranslation: '',
     };
   },
@@ -87,8 +100,15 @@ export default {
     onSelectTranslation() {
       this.selectedTranslation += this.wrapSelectedTranslation(document.getSelection().toString());
     },
+    onSelectTerm() {
+      this.selectedTerm = document.getSelection().toString();
+    },
     onKey(evt) {
       if ((evt.ctrlKey || evt.metaKey) && evt.altKey) {
+        if (evt.key === 'a') {
+          evt.preventDefault();
+          this.onSelectTerm();
+        }
         if (evt.key === 's') {
           evt.preventDefault();
           this.onSelectTranslation();
