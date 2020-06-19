@@ -35,6 +35,19 @@
             </tr>
         </tbody>
       </table>
+      <div class="input-group mb-3">
+        <textarea name="selected-translation"
+                  rows="5"
+                  cols="20"
+                  v-model="selectedTranslation"></textarea>
+        <div class="input-group-append">
+          <button type="button"
+                  class="btn btn-success btn-sm"
+                  @click="onSelectTranslation">
+                  Add Translation
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -47,6 +60,7 @@ export default {
     return {
       query: '',
       translation: [],
+      selectedTranslation: '',
     };
   },
   methods: {
@@ -61,9 +75,29 @@ export default {
           console.error(error);
         });
     },
+    wrapSelectedTranslation(translation) {
+      if (this.selectedTranslation === '') {
+        return translation;
+      }
+      return `; ${translation}`;
+    },
     onTranslate() {
       this.searchTranslation(this.query);
     },
+    onSelectTranslation() {
+      this.selectedTranslation += this.wrapSelectedTranslation(document.getSelection().toString());
+    },
+    onKey(evt) {
+      if ((evt.ctrlKey || evt.metaKey) && evt.altKey) {
+        if (evt.key === 's') {
+          evt.preventDefault();
+          this.onSelectTranslation();
+        }
+      }
+    },
+  },
+  mounted() {
+    document.addEventListener('keydown', this.onKey.bind(this));
   },
 };
 </script>
