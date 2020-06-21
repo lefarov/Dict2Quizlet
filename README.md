@@ -4,7 +4,7 @@ Automatically create the Quizlet cards from the Leo online dictionary when trans
 
 ### TODO:
 - [x] dock translation control to the bottom of the page
-  -[x] made translation table scrollable
+  - [x] made translation table scrollable
   - [ ] made translation control the "floating" pannel docked to the bottom of the window
 - [ ] integrate google pages
 - [ ] adjust styling 
