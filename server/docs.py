@@ -7,15 +7,16 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 
-def main():
-  SCOPES = ['https://www.googleapis.com/auth/documents']
-  DOCUMENT_ID = '195j9eDD3ccgjQRttHhJPymLJUCOUjs-jmwTrekvdjFE'
+def get_creds():
+  SCOPES = [
+    'https://www.googleapis.com/auth/documents', 
+    'https://www.googleapis.com/auth/drive'
+  ]
   creds = None
 
   if os.path.exists('server/token.pickle'):
-        with open('server/token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-
+    with open('server/token.pickle', 'rb') as token:
+        creds = pickle.load(token)
 
   if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
@@ -27,17 +28,10 @@ def main():
     with open('server/token.pickle', 'wb') as token:
         pickle.dump(creds, token)
 
-
-  service = build('docs', 'v1', credentials=creds)
-  document = service.documents().get(documentId=DOCUMENT_ID).execute()
-
-  print(f"The title of the document is: {document.get('title')}")
+  return creds
 
 
-def create_doc():
-  with open('server/token.pickle', 'rb') as token:
-    creds = pickle.load(token)
-
+def create_doc(creds):
   title = 'Test Document'
   body = dict(title=title)
   service = build('docs', 'v1', credentials=creds)
@@ -46,5 +40,24 @@ def create_doc():
   print(f"Created document with title: {doc.get('title')}")
 
 
+def list_files(folder_name, creds):
+  service = build('drive', 'v3', credentials=creds)
+  folder_res = service.files().list(
+    q=f"mimeType='application/vnd.google-apps.folder' and name='{folder_name}'", 
+    fields="files(id)").execute()
+  
+  folder_ids = folder_res.get('files', [])
+  if folder_ids:
+    folder_id = folder_ids[0].get('id')
+  else:
+    raise ValueError("leo2dict folder is not found in Google Drive")
+
+  files = service.files().list(
+    q=f"mimeType = 'application/vnd.google-apps.document' and '{folder_id}' in parents", 
+    fields="files(id, name)").execute()
+
+  return files.get('files', [])
+
 if __name__ == "__main__":
-  create_doc()
+  creds = get_creds()
+  print(list_files("leo2quizlet", creds))

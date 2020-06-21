@@ -7,5 +7,8 @@ Automatically create the Quizlet cards from the Leo online dictionary when trans
   - [x] made translation table scrollable
   - [ ] made translation control the "floating" pannel docked to the bottom of the window
 - [ ] integrate google pages
+  - [ ] print quiz files from a folder
+  - [ ] select quiz file
+  - [ ] append translation to the selected quiz file
 - [ ] adjust styling 
 - [ ] recreate project with new version of `vue cli` and compare generated `package.json`.
