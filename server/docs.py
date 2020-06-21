@@ -41,6 +41,7 @@ def create_doc(creds):
 
 
 def list_files(folder_name, creds):
+  # TODO: search for files in specified folder as one query
   service = build('drive', 'v3', credentials=creds)
   folder_res = service.files().list(
     q=f"mimeType='application/vnd.google-apps.folder' and name='{folder_name}'", 
