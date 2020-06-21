@@ -44,20 +44,20 @@ def list_files(folder_name, creds):
   service = build('drive', 'v3', credentials=creds)
   folder_res = service.files().list(
     q=f"mimeType='application/vnd.google-apps.folder' and name='{folder_name}'", 
-    fields="files(id)").execute()
+    fields='files(id)').execute()
   
   folder_ids = folder_res.get('files', [])
   if folder_ids:
     folder_id = folder_ids[0].get('id')
   else:
-    raise ValueError("leo2dict folder is not found in Google Drive")
+    raise ValueError('leo2dict folder is not found in Google Drive')
 
   files = service.files().list(
     q=f"mimeType = 'application/vnd.google-apps.document' and '{folder_id}' in parents", 
-    fields="files(id, name)").execute()
+    fields='files(id, name)').execute()
 
   return files.get('files', [])
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   creds = get_creds()
-  print(list_files("leo2quizlet", creds))
+  print(list_files('leo2quizlet', creds))
