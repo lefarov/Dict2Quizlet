@@ -40,7 +40,7 @@ def create_doc(creds):
   print(f"Created document with title: {doc.get('title')}")
 
 
-def list_files(folder_name, creds):
+def list_docs(folder_name, creds):
   # TODO: search for files in specified folder as one query
   service = build('drive', 'v3', credentials=creds)
   folder_res = service.files().list(
@@ -61,4 +61,4 @@ def list_files(folder_name, creds):
 
 if __name__ == '__main__':
   creds = get_creds()
-  print(list_files('leo2quizlet', creds))
+  print(list_docs('leo2quizlet', creds))
