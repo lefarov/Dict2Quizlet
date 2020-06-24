@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from leo import search
+from docs import list_docs, get_creds, get_folder_id
 
 
 BOOKS = [
@@ -57,6 +58,15 @@ def translate(query):
     response_object = {"status": "success"}
     results = search(query, "https://dict.leo.org/german-english/")
     response_object["translation"] = results
+    return jsonify(response_object)
+
+
+@app.route('/docs/<folder>', methods=['GET'])
+def get_docs(folder):
+    response_object = {"status": "success"}
+    creds = get_creds()
+    folder_id = get_folder_id('leo2quizlet', creds)
+    response_object["docs"] = list_docs(folder_id, creds)
     return jsonify(response_object)
 
 

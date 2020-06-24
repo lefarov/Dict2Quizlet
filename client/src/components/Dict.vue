@@ -20,8 +20,8 @@
         </div>
         <div class="panel-body table-responsive">
           <table class="table table-striped table-sm"
-                v-for="(category, name, index) in translation"
-                :key="index">
+                 v-for="(category, name, index) in translation"
+                 :key="index">
             <thead class="thead-dark">
               <tr>
                 <th scope="col">{{ name }}</th>
@@ -36,6 +36,18 @@
             </tbody>
           </table>
         </div>
+        <div class="form-group mt-3">
+          <label for="googleDocSelect">Select Document</label>
+          <select class="form-control"
+                  id="googleDocSelect"
+                  v-model="googleDocId">
+            <option v-for="(doc, index) in googleDocs"
+                    :key="index"
+                    :value="doc.id">
+                    {{ doc.name }}
+            </option>
+          </select>
+        </div>
         <div class="input-group mt-3">
           <input id="selected-term"
                 type="text"
@@ -48,7 +60,7 @@
           <div class="input-group-append">
             <button type="button"
                     class="btn btn-danger btn-sm"
-                    @click="onSelectTranslation">
+                    @click="onClear">
                     Clear
             </button>
             <button type="button"
@@ -65,7 +77,7 @@
 
 <style>
 .table-responsive {
-    max-height:70vh;
+    max-height:60vh;
 }
 </style>
 
@@ -77,6 +89,8 @@ export default {
     return {
       query: '',
       translation: [],
+      googleDocs: [],
+      googleDocId: '',
       selectedTerm: '',
       selectedTranslation: '',
     };
@@ -87,6 +101,17 @@ export default {
       axios.get(path)
         .then((res) => {
           this.translation = res.data.translation;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    listGoogleDocs(folder) {
+      const path = `http://localhost:5000/docs/${folder}`;
+      axios.get(path)
+        .then((res) => {
+          this.googleDocs = res.data.docs;
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -108,6 +133,10 @@ export default {
     onSelectTerm() {
       this.selectedTerm = document.getSelection().toString();
     },
+    onClear() {
+      this.selectedTerm = '';
+      this.selectedTranslation = '';
+    },
     onKey(evt) {
       if ((evt.ctrlKey || evt.metaKey) && evt.altKey) {
         if (evt.key === 'a') {
@@ -123,6 +152,7 @@ export default {
   },
   mounted() {
     document.addEventListener('keydown', this.onKey.bind(this));
+    this.listGoogleDocs('leo2quizlet');
   },
 };
 </script>

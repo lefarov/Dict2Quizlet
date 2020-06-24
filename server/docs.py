@@ -69,6 +69,7 @@ def append_transalation(translation, doc_id, creds):
   service = build('docs', 'v1', credentials=creds)
   document = service.documents().get(documentId=doc_id).execute()
 
+  # TODO: there should be the easier way :(
   # Get the last content item to define the insertion index
   last_content_item = document.get('body').get('content')[-1]
   # Build the request
