@@ -17,6 +17,7 @@ Automatically create the Quizlet cards from the Leo dictionary when translating 
   - [x] list quiz Docs
   - [x] select quiz Doc
   - [ ] create new quiz Doc
-  - [ ] append translation to the selected quiz Doc
+  - [x] append translation to the selected quiz Doc
+  - [ ] rewrite in javascript
 - [ ] Adjust styling 
 - [ ] Recreate project with new version of `vue cli` and compare generated `package.json`.

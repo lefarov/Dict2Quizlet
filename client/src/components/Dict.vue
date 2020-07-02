@@ -5,11 +5,11 @@
         <h1>Dict</h1>
         <div class="input-group mb-3">
           <input id="search-term-input"
-                type="text"
-                class="form-control"
-                placeholder="Search term"
-                v-model="query"
-                @keyup.enter="onTranslate">
+                 type="text"
+                 class="form-control"
+                 placeholder="Search term"
+                 v-model="query"
+                 @keyup.enter="onTranslate">
           <div class="input-group-append">
             <button type="button"
                     class="btn btn-success btn-sm"
@@ -39,7 +39,8 @@
         <div class="form-group mt-3">
           <label for="googleDocSelect">Select Document</label>
           <select class="form-control"
-                  id="googleDocSelect"
+                  ref="googleDocSelect"
+                  id="google-doc-select"
                   v-model="googleDocId">
             <option v-for="(doc, index) in googleDocs"
                     :key="index"
@@ -65,7 +66,7 @@
             </button>
             <button type="button"
                     class="btn btn-primary btn-sm"
-                    @click="onSelectTranslation">
+                    @click="onSubmit">
                     Submit
             </button>
           </div>
@@ -93,11 +94,13 @@ export default {
       googleDocId: '',
       selectedTerm: '',
       selectedTranslation: '',
+      message: '',
+      showMessage: false,
     };
   },
   methods: {
     searchTranslation(query) {
-      const path = `http://localhost:5000/search/${query}`;
+      const path = `http://localhost:5000/translate/${query}`;
       axios.get(path)
         .then((res) => {
           this.translation = res.data.translation;
@@ -112,6 +115,19 @@ export default {
       axios.get(path)
         .then((res) => {
           this.googleDocs = res.data.docs;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    appendTranslation(payload, docID) {
+      const path = `http://localhost:5000/append_translation/${docID}`;
+      axios.post(path, payload)
+        .then((res) => {
+          this.onClear();
+          this.message = res.data.message;
+          this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -136,6 +152,13 @@ export default {
     onClear() {
       this.selectedTerm = '';
       this.selectedTranslation = '';
+    },
+    onSubmit() {
+      const payload = {
+        term: this.selectedTerm,
+        translation: this.selectedTranslation,
+      };
+      this.appendTranslation(payload, this.$refs.googleDocSelect.value);
     },
     onKey(evt) {
       if ((evt.ctrlKey || evt.metaKey) && evt.altKey) {

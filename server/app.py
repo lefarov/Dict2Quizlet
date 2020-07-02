@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from leo import search
-from docs import list_docs, get_creds, get_folder_id
+from docs import list_docs, get_creds, get_folder_id, append_transalation
 
 
 BOOKS = [
@@ -47,13 +47,13 @@ def get_book_index(book_id):
     raise ValueError("trying to access unexisting book.")
 
 
-# sanity check route
+# Sanity check route
 @app.route('/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
 
 
-@app.route("/search/<query>", methods=["GET"])
+@app.route("/translate/<query>", methods=["GET"])
 def translate(query):
     response_object = {"status": "success"}
     results = search(query, "https://dict.leo.org/german-english/")
@@ -61,12 +61,31 @@ def translate(query):
     return jsonify(response_object)
 
 
-@app.route('/docs/<folder>', methods=['GET'])
-def get_docs(folder):
+@app.route('/docs/<folder>', methods=['GET', 'POST'])
+def docs(folder):
     response_object = {"status": "success"}
     creds = get_creds()
-    folder_id = get_folder_id('leo2quizlet', creds)
-    response_object["docs"] = list_docs(folder_id, creds)
+
+    if request.method == "POST":
+        return  # create folder here    
+    elif request.method == "GET":
+        folder_id = get_folder_id('leo2quizlet', creds)
+        response_object["docs"] = list_docs(folder_id, creds)
+    return jsonify(response_object)
+
+
+@app.route('/append_translation/<doc_id>', methods=["POST"])
+def append_translation(doc_id):
+    response_object = {"status": "success"}
+    creds = get_creds()
+    
+    payload = request.get_json()
+    append_transalation(
+        payload.get('term', ''),
+        payload.get('translation', ''), 
+        doc_id, creds)
+
+    response_object["message"] = f"Translation is appended to {doc_id}"
     return jsonify(response_object)
 
 

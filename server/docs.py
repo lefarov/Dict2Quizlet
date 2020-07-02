@@ -65,7 +65,7 @@ def create_doc(name, folder_id, creds):
   return doc_file.get('id')
 
 
-def append_transalation(translation, doc_id, creds):
+def append_transalation(term, translation, doc_id, creds):
   service = build('docs', 'v1', credentials=creds)
   document = service.documents().get(documentId=doc_id).execute()
 
@@ -77,7 +77,7 @@ def append_transalation(translation, doc_id, creds):
     { 'insertText': 
       { 'location': 
         { 'index': last_content_item.get('startIndex'), },
-        'text': translation
+        'text': f"{term}\t{translation}\n"
       }
     },
   ]
