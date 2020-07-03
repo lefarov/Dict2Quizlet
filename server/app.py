@@ -85,7 +85,7 @@ def append_translation(doc_id):
         payload.get('translation', ''), 
         doc_id, creds)
 
-    response_object["message"] = f"Translation is appended to {doc_id}"
+    response_object["message"] = f"Translation is appended!"
     return jsonify(response_object)
 
 

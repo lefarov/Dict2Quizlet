@@ -71,6 +71,9 @@
             </button>
           </div>
         </div>
+        <alert class="mt-3"
+               v-if="showMessage"
+               :message="message"></alert>
       </div>
     </div>
   </div>
@@ -84,6 +87,7 @@
 
 <script>
 import axios from 'axios';
+import Alert from './Alert.vue';
 
 export default {
   data() {
@@ -97,6 +101,9 @@ export default {
       message: '',
       showMessage: false,
     };
+  },
+  components: {
+    alert: Alert,
   },
   methods: {
     searchTranslation(query) {
