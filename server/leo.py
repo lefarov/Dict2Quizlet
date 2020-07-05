@@ -28,25 +28,23 @@ from tabulate import tabulate
 arg_parser = argparse.ArgumentParser(
     description="Query the leo.org German/English dictionary.",
     epilog="Note that the developers of this software are in "
-           "no way affiliated with leo.org."
+    "no way affiliated with leo.org.",
 )
-arg_parser.add_argument('query',
-                        metavar='search-term',
-                        nargs='+',
-                        help="word(s) to search for")
-arg_parser.add_argument('-j', '--json',
-                        action='store_true',
-                        default=False,
-                        help='Format results as JSON.')
+arg_parser.add_argument(
+    "query", metavar="search-term", nargs="+", help="word(s) to search for"
+)
+arg_parser.add_argument(
+    "-j", "--json", action="store_true", default=False, help="Format results as JSON."
+)
 
 section_names = (
-    'subst',
-    'verb',
-    'adjadv',
-    'preaep',
-    'definition',
-    'phrase',
-    'example',
+    "subst",
+    "verb",
+    "adjadv",
+    "preaep",
+    "definition",
+    "phrase",
+    "example",
 )
 
 
@@ -65,8 +63,8 @@ def _get_text(elt):
     return buf.getvalue()
 
 
-def search(term, uri='https://dict.leo.org/ende/'):
-    resp = requests.get(uri, params={'search': term})
+def search(term, uri="https://dict.leo.org/ende/"):
+    resp = requests.get(uri, params={"search": term})
     p = etree.HTMLParser()
     html = etree.parse(StringIO(resp.text), p)
     ret = {}
@@ -78,25 +76,25 @@ def search(term, uri='https://dict.leo.org/ende/'):
         results = section.findall(".//td[@lang='en']")
         for r_en in results:
             r_de = r_en.find("./../td[@lang='de']")
-            ret[section_name].append({
-                'en': _get_text(r_en).strip(),
-                'de': _get_text(r_de).strip(),
-            })
+            ret[section_name].append(
+                {"en": _get_text(r_en).strip(), "de": _get_text(r_de).strip(),}
+            )
     return ret
 
 
 def main():
     args = arg_parser.parse_args()
-    query = ' '.join(args.query)
+    query = " ".join(args.query)
     results = search(query)
     if args.json:
         print(json.dumps(results))
     else:
         for section_name in results.keys():
             print(section_name)
-            table = [[r['en'], r['de']] for r in results[section_name]]
-            print(tabulate(table, headers=['English', 'German']))
-            print('')  # Extra newline
+            table = [[r["en"], r["de"]] for r in results[section_name]]
+            print(tabulate(table, headers=["English", "German"]))
+            print("")  # Extra newline
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
