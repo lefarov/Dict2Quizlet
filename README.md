@@ -16,8 +16,8 @@ GOAL: Simplify the creataion of Quizlet flip cards for queried translations of G
 - [ ] Integrate Google Docs
   - [x] list quiz Docs
   - [x] select quiz Doc
-  - [ ] create new quiz Doc
+  - [x] create new quiz Doc
   - [x] append translation to the selected quiz Doc
   - [ ] rewrite in javascript (optimization)
-- [ ] Improve style and interface
+- [ ] Improve design
 - [ ] Recreate project with new version of `vue cli` and compare generated `package.json`.
