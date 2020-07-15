@@ -11,8 +11,10 @@
               class="form-control"
               placeholder="Search term"
               v-model="query"
-              @keyup.enter="onTranslate"
+              @keydown.enter="onTranslate"
               @input="onAutocomplete"
+              @keydown.up="selectPrev()"
+              @keydown.down="selectNext()"
             >
             <ul
               class="autocomplete-results"
@@ -22,6 +24,8 @@
                 class="autocomplete-result"
                 v-for="(suggestion, index) in atcSuggestion"
                 :key="index"
+                @click="selectSuggestion(suggestion)"
+                :class="{ 'is-active': index === atcCounter }"
               >
                   {{ suggestion }}
               </li>
@@ -146,6 +150,7 @@
   padding: 4px 2px;
   cursor: pointer;
 }
+.autocomplete-result.is-active,
 .autocomplete-result:hover {
   background-color: #4AAE9B;
   color: white;
@@ -162,6 +167,7 @@ export default {
       query: '',
       atcSuggestion: [],
       atcVisible: false,
+      atcCounter: -1,
       translation: [],
       googleDocs: [],
       googleDocId: '',
@@ -195,11 +201,26 @@ export default {
         .then((res) => {
           [, this.atcSuggestion] = res.data;
           this.atcVisible = this.atcSuggestion.length !== 0;
+          this.atcCounter = -1;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
         });
+    },
+    selectSuggestion(suggestion) {
+      this.query = suggestion;
+      this.atcVisible = false;
+    },
+    selectPrev() {
+      if (this.atcCounter > 0) {
+        this.atcCounter -= 1;
+      }
+    },
+    selectNext() {
+      if (this.atcCounter < this.atcSuggestion.length) {
+        this.atcCounter += 1;
+      }
     },
     listGoogleDocs(folder) {
       const path = `http://localhost:5000/docs/${folder}`;
