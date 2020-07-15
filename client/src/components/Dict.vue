@@ -4,17 +4,36 @@
       <div class="col-sm-12">
         <h1>Dict</h1>
         <div class="input-group mb-3">
-          <input id="search-term-input"
-                 type="text"
-                 class="form-control"
-                 placeholder="Search term"
-                 v-model="query"
-                 @keyup.enter="onTranslate">
+          <div class="autocomplete">
+            <input
+              id="search-term-input"
+              type="text"
+              class="form-control"
+              placeholder="Search term"
+              v-model="query"
+              @keyup.enter="onTranslate"
+              @input="onAutocomplete"
+            >
+            <ul
+              class="autocomplete-results"
+              v-show="atcVisible && query"
+            >
+              <li
+                class="autocomplete-result"
+                v-for="(suggestion, index) in atcSuggestion"
+                :key="index"
+              >
+                  {{ suggestion }}
+              </li>
+            </ul>
+          </div>
           <div class="input-group-append">
-            <button type="button"
-                    class="btn btn-success btn-sm"
-                    @click="onTranslate">
-                    Translate
+            <button
+              type="button"
+              class="btn btn-success btn-sm"
+              @click="onTranslate"
+            >
+              Translate
             </button>
           </div>
         </div>
@@ -111,6 +130,26 @@
 .table-responsive {
     max-height:60vh;
 }
+.autocomplete {
+    position: relative;
+}
+.autocomplete-results {
+  padding: 0;
+  margin: 0;
+  border: 1px solid #eeeeee;
+  height: 120px;
+  overflow: auto;
+}
+.autocomplete-result {
+  list-style: none;
+  text-align: left;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+.autocomplete-result:hover {
+  background-color: #4AAE9B;
+  color: white;
+}
 </style>
 
 <script>
@@ -121,6 +160,8 @@ export default {
   data() {
     return {
       query: '',
+      atcSuggestion: [],
+      atcVisible: false,
       translation: [],
       googleDocs: [],
       googleDocId: '',
@@ -142,6 +183,18 @@ export default {
       axios.get(path)
         .then((res) => {
           this.translation = res.data.translation;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    autocomplete(payload) {
+      const path = '/autocomplete/';
+      axios.get(path, payload)
+        .then((res) => {
+          [, this.atcSuggestion] = res.data;
+          this.atcVisible = this.atcSuggestion.length !== 0;
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -193,6 +246,14 @@ export default {
     },
     onTranslate() {
       this.searchTranslation(this.query);
+    },
+    onAutocomplete() {
+      const payload = {
+        params: {
+          q: this.query,
+        },
+      };
+      this.autocomplete(payload);
     },
     onSelectTranslation() {
       this.selectedTranslation += this.wrapSelectedTranslation(document.getSelection().toString());
