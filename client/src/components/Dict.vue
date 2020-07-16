@@ -3,16 +3,19 @@
     <div class="row">
       <div class="col-sm-12">
         <h1>Dict</h1>
-        <div class="input-group mb-3">
-          <div class="autocomplete">
+        <div class="btn-toolbar mb-3">
+          <div class="autocomplete input-group mr-2">
             <input
               id="search-term-input"
               type="text"
               class="form-control"
               placeholder="Search term"
               v-model="query"
-              @keydown.enter="onTranslate"
-              @input="onAutocomplete"
+              @input="onAutocomplete()"
+              @keydown.enter="
+                atcVisible
+                ? selectSuggestion(atcSuggestion[atcCounter])
+                : onTranslate()"
               @keydown.up="selectPrev()"
               @keydown.down="selectNext()"
             >
@@ -31,7 +34,7 @@
               </li>
             </ul>
           </div>
-          <div class="input-group-append">
+          <div class="btn-group">
             <button
               type="button"
               class="btn btn-success btn-sm"
@@ -132,17 +135,23 @@
 
 <style>
 .table-responsive {
-    max-height:60vh;
+  max-height:60vh;
 }
 .autocomplete {
-    position: relative;
+  position: relative;
+  height: 40px;
 }
 .autocomplete-results {
+  position: absolute;
+  top: 40px;
   padding: 0;
   margin: 0;
   border: 1px solid #eeeeee;
+  background-color: white;
+  width: 100%;
   height: 120px;
   overflow: auto;
+  z-index: 3;
 }
 .autocomplete-result {
   list-style: none;
@@ -319,13 +328,24 @@ export default {
         }
       }
     },
+    onClickOutside(evt) {
+      if (!this.$el.contains(evt.target)) {
+        this.atcVisible = false;
+        this.atcCounter = -1;
+      }
+    },
     initCreateForm() {
       this.createDocForm.name = '';
     },
   },
   mounted() {
     document.addEventListener('keydown', this.onKey.bind(this));
+    document.addEventListener('click', this.onClickOutside);
     this.listGoogleDocs('leo2quizlet');
+  },
+  destroyed() {
+    document.removeEventListener('keydown', this.onKey.bind(this));
+    document.removeEventListener('click', this.onClickOutside);
   },
 };
 </script>
