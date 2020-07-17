@@ -2,20 +2,21 @@ import uuid
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from leo import search
+from leo import LeoDict
 from docs import list_docs, get_creds, get_folder_id, append_transalation, create_doc
 
-
-# Configuration
-DEBUG = True
 
 # Instantiate the app
 app = Flask(__name__)
 app.config.from_object(__name__)
+# Enabled to present the transalations in the same order as in Leo Dict
+app.config["JSON_SORT_KEYS"] = False
 
 # Enable CORS
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+# Create dictionary object
+ld = LeoDict()
 
 # Sanity check route
 @app.route("/ping", methods=["GET"])
@@ -26,7 +27,7 @@ def ping_pong():
 @app.route("/translate/<query>", methods=["GET"])
 def translate(query):
     response_object = {"status": "failure"}
-    results = search(query, "https://dict.leo.org/german-english/")
+    results = ld.search(query, "https://dict.leo.org/german-english/")
     response_object["translation"] = results
 
     response_object["status"] = "success"
