@@ -3,18 +3,44 @@
     <div class="row">
       <div class="col-sm-12">
         <h1>Dict</h1>
-        <div class="input-group mb-3">
-          <input id="search-term-input"
-                 type="text"
-                 class="form-control"
-                 placeholder="Search term"
-                 v-model="query"
-                 @keyup.enter="onTranslate">
-          <div class="input-group-append">
-            <button type="button"
-                    class="btn btn-success btn-sm"
-                    @click="onTranslate">
-                    Translate
+        <div class="btn-toolbar mb-3">
+          <div class="autocomplete input-group mr-2">
+            <input
+              id="search-term-input"
+              type="text"
+              class="form-control"
+              placeholder="Search term"
+              v-model="query"
+              @input="onAutocomplete()"
+              @keydown.enter="
+                atcVisible
+                ? selectSuggestion(atcSuggestion[atcCounter])
+                : onTranslate()"
+              @keydown.up="selectPrev()"
+              @keydown.down="selectNext()"
+            >
+            <ul
+              class="autocomplete-results"
+              v-show="atcVisible && query"
+            >
+              <li
+                class="autocomplete-result"
+                v-for="(suggestion, index) in atcSuggestion"
+                :key="index"
+                @click="selectSuggestion(suggestion)"
+                :class="{ 'is-active': index === atcCounter }"
+              >
+                  {{ suggestion }}
+              </li>
+            </ul>
+          </div>
+          <div class="btn-group">
+            <button
+              type="button"
+              class="btn btn-success btn-sm"
+              @click="onTranslate"
+            >
+              Translate
             </button>
           </div>
         </div>
@@ -109,7 +135,34 @@
 
 <style>
 .table-responsive {
-    max-height:60vh;
+  max-height:60vh;
+}
+.autocomplete {
+  position: relative;
+  height: 40px;
+}
+.autocomplete-results {
+  position: absolute;
+  top: 40px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #eeeeee;
+  background-color: white;
+  width: 100%;
+  height: 120px;
+  overflow: auto;
+  z-index: 3;
+}
+.autocomplete-result {
+  list-style: none;
+  text-align: left;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+.autocomplete-result.is-active,
+.autocomplete-result:hover {
+  background-color: #4AAE9B;
+  color: white;
 }
 </style>
 
@@ -121,6 +174,9 @@ export default {
   data() {
     return {
       query: '',
+      atcSuggestion: [],
+      atcVisible: false,
+      atcCounter: -1,
       translation: [],
       googleDocs: [],
       googleDocId: '',
@@ -147,6 +203,33 @@ export default {
           // eslint-disable-next-line
           console.error(error);
         });
+    },
+    autocomplete(payload) {
+      const path = '/autocomplete/';
+      axios.get(path, payload)
+        .then((res) => {
+          [, this.atcSuggestion] = res.data;
+          this.atcVisible = this.atcSuggestion.length !== 0;
+          this.atcCounter = -1;
+        })
+        .catch((error) => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
+    selectSuggestion(suggestion) {
+      this.query = suggestion;
+      this.atcVisible = false;
+    },
+    selectPrev() {
+      if (this.atcCounter > 0) {
+        this.atcCounter -= 1;
+      }
+    },
+    selectNext() {
+      if (this.atcCounter < this.atcSuggestion.length) {
+        this.atcCounter += 1;
+      }
     },
     listGoogleDocs(folder) {
       const path = `http://localhost:5000/docs/${folder}`;
@@ -194,6 +277,14 @@ export default {
     onTranslate() {
       this.searchTranslation(this.query);
     },
+    onAutocomplete() {
+      const payload = {
+        params: {
+          q: this.query,
+        },
+      };
+      this.autocomplete(payload);
+    },
     onSelectTranslation() {
       this.selectedTranslation += this.wrapSelectedTranslation(document.getSelection().toString());
     },
@@ -237,13 +328,24 @@ export default {
         }
       }
     },
+    onClickOutside(evt) {
+      if (!this.$el.contains(evt.target)) {
+        this.atcVisible = false;
+        this.atcCounter = -1;
+      }
+    },
     initCreateForm() {
       this.createDocForm.name = '';
     },
   },
   mounted() {
     document.addEventListener('keydown', this.onKey.bind(this));
+    document.addEventListener('click', this.onClickOutside);
     this.listGoogleDocs('leo2quizlet');
+  },
+  destroyed() {
+    document.removeEventListener('keydown', this.onKey.bind(this));
+    document.removeEventListener('click', this.onClickOutside);
   },
 };
 </script>
