@@ -2,6 +2,13 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-12">
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          @click="onTest"
+        >
+          Test
+        </button>
         <h1>Dict</h1>
         <div class="btn-toolbar mb-3">
           <div class="autocomplete input-group mr-2">
@@ -168,6 +175,8 @@
 
 <script>
 import axios from 'axios';
+// eslint-disable-next-line
+import docsFunc from '../docs.js';
 import Alert from './Alert.vue';
 
 export default {
@@ -193,6 +202,9 @@ export default {
     alert: Alert,
   },
   methods: {
+    onTest() {
+      // docsFunc.callWithCredentials(docsFunc.getFolderID, 'leo2quizlet');
+    },
     searchTranslation(query) {
       const path = `http://localhost:5000/translate/${query}`;
       axios.get(path)
